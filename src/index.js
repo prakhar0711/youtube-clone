@@ -3,29 +3,24 @@
 // require{'dotenv'}.config()
 import dotenv from "dotenv";
 import connectDB from "./db/index.js";
+import { app } from "./app.js";
 dotenv.config({
   path: "./env",
 });
-connectDB();
 
-/*
-//connect database
-//below is using IIFE concept-take a function and execute it immediately
-import express from "express";
-const app = express()
-(async () => {
-  try {
-    await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`);
-    app.on("error : ", (error) => {
-      console.log("ERROR:", error);
-      throw error;
+//wheneve an async function finishes execution it also returns a promise
+connectDB()
+  .then(() => {
+    //starting server after establishing connection to database
+    const server = app.listen(process.env.PORT || 7000, () => {
+      console.log(
+        `Server connection established. Listening on ${process.env.PORT}`
+      );
     });
-    app.listen(process.env.PORT, () => {
-      console.log(`listening on ${process.env.PORT}`);
+    server.on("error", (error) => {
+      console.log("SERVER ERROR!!! : ", error);
     });
-  } catch (error) {
-    console.log("ERROR : ", error);
-    throw error;
-  }
-})();
-*/
+  })
+  .catch((err) => {
+    console.log("MongoDb connection failed !!!", err);
+  });
